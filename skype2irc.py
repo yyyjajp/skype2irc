@@ -30,8 +30,8 @@ import sys, signal
 import time, datetime
 import string, textwrap
 
-from ircbot import SingleServerIRCBot
-from irclib import ServerNotConnectedError
+from irc.bot import SingleServerIRCBot
+from irc.client import ServerNotConnectedError
 from threading import Timer
 
 version = "0.3"
@@ -274,7 +274,7 @@ class MirrorBot(SingleServerIRCBot):
     """Create IRC bot class"""
 
     def __init__(self):
-        SingleServerIRCBot.__init__(self, servers, nick, (botname + " " + topics).encode("UTF-8"), reconnect_interval)
+        SingleServerIRCBot.__init__(self, servers, nick, botname + " " + topics, reconnect_interval)
 
     def start(self):
         """Override default start function to avoid starting/stalling the bot with no connection"""
@@ -311,12 +311,11 @@ class MirrorBot(SingleServerIRCBot):
         """Send messages to channels/nicks"""
         target = target.lower()
         try:
-            lines = msg.encode("UTF-8").split("\n")
+            lines = msg.split("\n")
             cur = 0
             for line in lines:
                 for irc_msg in wrapper.wrap(line.strip("\r")):
                     print target, irc_msg
-                    irc_msg += "\r\n"
                     if target not in lastsaid.keys():
                         lastsaid[target] = 0
                     while time.time()-lastsaid[target] < delay_btw_msgs:
@@ -353,9 +352,9 @@ class MirrorBot(SingleServerIRCBot):
 
     def on_pubmsg(self, connection, event):
         """React to channel messages"""
-        args = event.arguments()
-        source = event.source().split('!')[0]
-        target = event.target().lower()
+        args = event.arguments
+        source = event.source.split('!')[0]
+        target = event.target.lower()
         cmds = args[0].split()
         if cmds and cmds[0].rstrip(":,") == nick:
             if len(cmds)==2:
@@ -377,9 +376,9 @@ class MirrorBot(SingleServerIRCBot):
 
     def handle_ctcp(self, connection, event):
         """Handle CTCP events for emoting"""
-        args = event.arguments()
-        source = event.source().split('!')[0]
-        target = event.target().lower()
+        args = event.arguments
+        source = event.source.split('!')[0]
+        target = event.target.lower()
         if target in mirrors.keys():
             if source in mutedl[target]:
                 return
@@ -391,8 +390,8 @@ class MirrorBot(SingleServerIRCBot):
 
     def on_privmsg(self, connection, event):
         """React to ON, OF(F), ST(ATUS), IN(FO) etc for switching gateway (from IRC side only)"""
-        source = event.source().split('!')[0]
-        raw = event.arguments()[0].decode('utf-8', 'ignore')
+        source = event.source.split('!')[0]
+        raw = event.arguments[0].decode('utf-8', 'ignore')
         args = raw.split()
         if not args:
             return

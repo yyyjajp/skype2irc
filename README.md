@@ -17,7 +17,7 @@ FEATURES
 INSTALL
 -------
 
-On Ubuntu/Debian you need `python-irclib` and `python-skype` as well as Skype itself to run the script.
+On Ubuntu/Debian you need `python-irc` and `python-skype` as well as Skype itself to run the script.
 
 For `python-skype` I used the version 1.0.31.0 provided at `ppa:skype-wrapper/ppa`. Although newer version is packaged even for Ubuntu 11.04, this package didn't work out of the box on Ubuntu 12.04. Using latest source version from https://github.com/awahlig/skype4py works fine on Ubuntu 14.04.
 
