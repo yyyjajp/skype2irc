@@ -324,7 +324,7 @@ class MirrorBot(SingleServerIRCBot):
             cur = 0
             for line in lines:
                 for irc_msg in wrapper.wrap(line.strip("\r")):
-                    print target, irc_msg
+                    print datetime.datetime.now(), target, irc_msg
                     irc_msg = encode_irc(irc_msg)
                     if target not in lastsaid.keys():
                         lastsaid[target] = 0
