@@ -64,7 +64,7 @@ else:
 
     colors = True
 
-max_irc_msg_len = 442
+max_irc_msg_len = 128
 ping_interval = 2*60
 reconnect_interval = 30
 
@@ -73,7 +73,7 @@ max_seq_msgs = 2
 delay_btw_msgs = 0.35
 delay_btw_seqs = 0.15
 
-preferred_encodings = ["UTF-8", "CP1252", "ISO-8859-1"]
+preferred_encodings = ["ISO-2022-JP"]
 
 name_start = "<".decode('UTF-8') # "◀"
 name_end = ">".decode('UTF-8') # "▶"
@@ -257,6 +257,15 @@ def decode_irc(raw, preferred_encs = preferred_encodings):
             #enc += "+IGNORE"
     return res
 
+def encode_irc(raw, enc = preferred_encodings[0]):
+    """IRC charset encoder"""
+    if enc.lower() == 'utf-8':
+        return raw
+    res = raw.encode(enc)
+    # Deceive irc.client assuming utf-8 irc server
+    res = res.decode('utf-8')
+    return res
+
 def signal_handler(signal, frame):
     print "Ctrl+C pressed!"
     if pinger is not None:
@@ -316,6 +325,7 @@ class MirrorBot(SingleServerIRCBot):
             for line in lines:
                 for irc_msg in wrapper.wrap(line.strip("\r")):
                     print target, irc_msg
+                    irc_msg = encode_irc(irc_msg)
                     if target not in lastsaid.keys():
                         lastsaid[target] = 0
                     while time.time()-lastsaid[target] < delay_btw_msgs:
