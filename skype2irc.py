@@ -204,15 +204,18 @@ def skype_says(chat, msg, edited = False):
     send = chat.SendMessage
     senderDisplay = msg.FromDisplayName
     senderHandle = msg.FromHandle
+    sender = senderDisplay
+    if sender != senderHandle:
+        sender += " <" + senderHandle + ">"
 
     if edited:
         edit_label = " ✎".decode('UTF-8') + get_relative_time(msg.Datetime, display_full = False)
     else:
         edit_label = ""
     if msgtype == 'EMOTED':
-        bot.say(usemap[chat], emote_char + " " + get_nick_decorated(senderHandle) + edit_label + " " + raw)
+        bot.say(usemap[chat], emote_char + " " + get_nick_decorated(sender) + edit_label + " " + raw)
     elif msgtype == 'SAID':
-        bot.say(usemap[chat], name_start + get_nick_decorated(senderHandle) + edit_label + name_end + " " + raw)
+        bot.say(usemap[chat], name_start + get_nick_decorated(sender) + edit_label + name_end + " " + raw)
 
 def OnMessageStatus(Message, Status):
     """Skype message object listener"""
